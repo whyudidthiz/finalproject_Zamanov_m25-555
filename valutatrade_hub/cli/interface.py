@@ -2,6 +2,7 @@ import json
 import os
 import shlex
 
+from prettytable import PrettyTable
 from valutatrade_hub.core import usecases
 from valutatrade_hub.core.exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError
 from valutatrade_hub.infra.settings import SettingsLoader
@@ -37,6 +38,8 @@ def show_help():
   buy      --currency <код> --amount <количество>      - купить валюту (за USD)
   sell     --currency <код> --amount <количество>      - продать валюту (за USD)
   get-rate --from <валюта> --to <валюта>                - получить курс
+  update-rates                                          - принудительно обновить курсы из внешних API
+  show-rates [--currency <код>] [--top N] [--base <валюта>] - показать кэшированные курсы
   exit                                                   - выход
   help                                                   - эта справка
 """)
@@ -93,7 +96,10 @@ def main_loop():
                             for err in result["errors"]:
                                 print(f"  - {err}")
                         else:
-                            print(f"Update successful. Total rates updated: {result['total']}. Last refresh: {result['last_refresh']}")
+                            print(
+                                f"Update successful. Total rates updated: {result['total']}."
+                                f"Last refresh: {result['last_refresh']}"
+                                )
                     except Exception as e:
                         print(f"Update failed: {str(e)}")
 
@@ -101,7 +107,6 @@ def main_loop():
                     currency = kwargs.get("currency")
                     top = kwargs.get("top")
                     base = kwargs.get("base", "USD")
-
                     try:
                         settings = SettingsLoader()
                         rates_path = settings.get('data_path', 'data/') + "rates.json"
@@ -119,7 +124,7 @@ def main_loop():
                             print("В кеше нет данных.")
                             continue
 
-                        # Фильтрация по валюте
+                        # Фильтрация по валюте (если указана)
                         if currency:
                             filtered = {k: v for k, v in pairs.items() if k.startswith(currency.upper() + '_')}
                             if not filtered:
@@ -127,7 +132,7 @@ def main_loop():
                                 continue
                             pairs = filtered
 
-                        # Сортировка по убыванию курса (для top)
+                        # Преобразуем в список для сортировки
                         items = list(pairs.items())
                         if top:
                             try:
@@ -137,12 +142,18 @@ def main_loop():
                             except ValueError:
                                 pass
 
-                        print(f"Rates from cache (updated at {last_refresh}):")
+                        # Создаём таблицу PrettyTable
+                        table = PrettyTable()
+                        table.field_names = ["Pair", "Rate"]
                         for pair, data in items:
-                            print(f"- {pair}: {data['rate']}")
+                            # Округление до 5 знаков для красоты
+                            table.add_row([pair, f"{data['rate']:.5f}"])
+                        
+                        print(f"Rates from cache (updated at {last_refresh}):")
+                        print(table)
 
                     except Exception as e:
-                        print(f"Ошибка при показе курсов: {str(e)}")
+                        print(f"Ошибка при показе курсов: {e}")
 
                 case "login":
                     username = kwargs.get("username")
@@ -219,6 +230,10 @@ def main_loop():
                         print(f"Ошибка: {e}\nПроверьте поддерживаемые коды валют (например, USD, EUR, BTC, ETH).")
                     except ApiRequestError as e:
                         print(f"Ошибка API: {e}. Повторите попытку позже.")
+
+                case "logout":
+                    usecases.logout()
+                    print("Вы вышли из системы.")
 
                 case _:
                     print("Неизвестная команда. Введите 'help' для справки.")

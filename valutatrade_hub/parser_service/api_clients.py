@@ -37,7 +37,7 @@ class BaseApiClient(ABC):
             try:
                 error_data = response.json()
                 error_msg = error_data.get('error', str(e))
-            except:
+            except Exception:
                 error_msg = str(e)
             raise ApiRequestError(f"HTTP ошибка {response.status_code}: {error_msg}")
         except Exception as e:
@@ -49,7 +49,9 @@ class CoinGeckoClient(BaseApiClient):
 
     def fetch_rates(self) -> Dict[str, float]:
         # Формируем список ID для запроса
-        crypto_ids = [self.config.CRYPTO_ID_MAP[code] for code in self.config.CRYPTO_CURRENCIES if code in self.config.CRYPTO_ID_MAP]
+        crypto_ids = [self.config.CRYPTO_ID_MAP[code]
+                      for code in self.config.CRYPTO_CURRENCIES
+                      if code in self.config.CRYPTO_ID_MAP]
         if not crypto_ids:
             return {}
 
@@ -78,7 +80,11 @@ class ExchangeRateApiClient(BaseApiClient):
             raise ApiRequestError("API ключ для ExchangeRate-API не задан")
 
         # Формируем URL: https://v6.exchangerate-api.com/v6/KEY/latest/USD
-        url = f"{self.config.EXCHANGERATE_API_URL}/{self.config.EXCHANGERATE_API_KEY}/latest/{self.config.BASE_CURRENCY}"
+        url = (
+            f"{self.config.EXCHANGERATE_API_URL}/"
+                f"{self.config.EXCHANGERATE_API_KEY}/latest/"
+                f"{self.config.BASE_CURRENCY}"
+                )
         data = self._make_request(url)
 
         if data.get('result') != 'success':

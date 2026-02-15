@@ -1,0 +1,48 @@
+2026-02-16T02:35:39.960 INFO action=REGISTER user=anonymous base=USD result=OK
+2026-02-16T02:36:01.385 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T02:38:58.450 INFO Starting rates update...
+2026-02-16T02:38:59.061 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T02:38:59.628 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T02:38:59.651 INFO Cache updated with 6 rates
+2026-02-16T02:41:56.629 INFO Starting rates update...
+2026-02-16T02:41:57.142 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T02:41:57.569 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T02:41:57.604 INFO Cache updated with 6 rates
+2026-02-16T02:44:41.352 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T02:54:40.903 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T02:57:14.399 INFO Starting rates update...
+2026-02-16T02:57:15.046 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T02:57:15.668 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T02:57:15.732 INFO Cache updated with 6 rates
+2026-02-16T02:59:11.855 INFO Starting rates update...
+2026-02-16T02:59:12.333 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T02:59:12.760 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T02:59:12.778 INFO Cache updated with 6 rates
+2026-02-16T03:09:18.183 INFO Starting rates update...
+2026-02-16T03:09:18.747 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T03:09:19.283 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T03:09:19.315 INFO Cache updated with 6 rates
+2026-02-16T03:17:38.032 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T03:18:08.999 INFO Starting rates update...
+2026-02-16T03:18:09.578 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T03:18:10.088 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T03:18:10.109 INFO Cache updated with 6 rates
+2026-02-16T03:31:30.556 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T03:32:09.527 INFO action=REGISTER user=anonymous base=USD result=OK
+2026-02-16T03:32:32.417 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T03:52:07.410 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T03:54:50.637 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T03:55:15.019 INFO Starting rates update...
+2026-02-16T03:55:15.613 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T03:55:16.166 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T03:55:16.194 INFO Cache updated with 6 rates
+2026-02-16T03:55:46.292 INFO action=BUY user=aboba user_id=2 base=USD result=OK
+2026-02-16T03:56:39.072 INFO Starting rates update...
+2026-02-16T03:56:39.580 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T03:56:40.000 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T03:56:40.021 INFO Cache updated with 6 rates
+2026-02-16T04:26:14.964 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T04:26:37.090 INFO Starting rates update...
+2026-02-16T04:26:37.647 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T04:26:37.664 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T04:26:37.666 INFO Cache updated with 3 rates

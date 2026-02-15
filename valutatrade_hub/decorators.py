@@ -21,10 +21,6 @@ def log_action(verbose: bool = False):
             currency = kwargs.get('currency')
             amount = kwargs.get('amount')
             base = kwargs.get('base_currency', 'USD')  # по умолчанию
-            rate = None
-
-            # Словарь для дополнительной информации при verbose
-            extra_info = {}
 
             try:
                 result = func(*args, **kwargs)

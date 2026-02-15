@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import Any, Dict, List
 
 from valutatrade_hub.core.exceptions import ApiRequestError

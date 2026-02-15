@@ -1,9 +1,8 @@
-from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from valutatrade_hub.core import utils
 from valutatrade_hub.core.currencies import get_currency
-from valutatrade_hub.core.exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError
+from valutatrade_hub.core.exceptions import CurrencyNotFoundError, InsufficientFundsError
 from valutatrade_hub.core.models import Portfolio, User, Wallet
 from valutatrade_hub.decorators import log_action
 from valutatrade_hub.infra.settings import SettingsLoader
@@ -63,7 +62,10 @@ def register(username: str, password: str) -> str:
     _portfolios[user.user_id] = portfolio
 
     _save_all()
-    return f"Пользователь '{username}' зарегистрирован (id={new_id}). Войдите: login --username {username} --password ****"
+    return (
+    f"Пользователь '{username}' зарегистрирован (id={new_id}). "
+    f"Войдите: login --username {username} --password ****"
+    )
 
 @log_action()
 def login(username: str, password: str) -> str:
@@ -91,7 +93,8 @@ def show_portfolio(base_currency: Optional[str] = None) -> str:
     if not portfolio:
         raise ValueError("Портфель не найден")
 
-    rates = utils.load_rates()
+    rates_data = utils.load_rates()
+    pairs = rates_data.get('pairs', {})
     lines = [f"Портфель пользователя '{_current_user.username}' (база: {base_currency}):"]
     total = 0.0
     if not portfolio.wallets:
@@ -99,20 +102,26 @@ def show_portfolio(base_currency: Optional[str] = None) -> str:
     else:
         for code, wallet in portfolio.wallets.items():
             balance = wallet.balance
-            rate_key = f"{code}_{base_currency}"
-            inv_key = f"{base_currency}_{code}"
-            rate = None
-            if rate_key in rates:
-                rate = rates[rate_key]['rate']
-            elif inv_key in rates:
-                rate = 1.0 / rates[inv_key]['rate']
-            if rate is None:
-                converted = 0.0
-                rate_str = "N/A"
+            # Если валюта совпадает с базовой, курс = 1
+            if code == base_currency:
+                rate = 1.0
+                rate_str = "1.0000"
+                converted = balance
             else:
-                converted = balance * rate
-                total += converted
-                rate_str = f"{rate:.4f}"
+                rate_key = f"{code}_{base_currency}"
+                inv_key = f"{base_currency}_{code}"
+                rate = None
+                if rate_key in pairs:
+                    rate = pairs[rate_key]['rate']
+                elif inv_key in pairs:
+                    rate = 1.0 / pairs[inv_key]['rate']
+                if rate is None:
+                    converted = 0.0
+                    rate_str = "N/A"
+                else:
+                    converted = balance * rate
+                    rate_str = f"{rate:.4f}"
+            total += converted
             lines.append(f"  - {code}: {balance:.2f}  → {converted:.2f} {base_currency} (курс: {rate_str})")
     lines.append("-" * 40)
     lines.append(f"ИТОГО: {total:.2f} {base_currency}")
@@ -132,15 +141,17 @@ def buy(currency: str, amount: float) -> str:
     portfolio = _portfolios[_current_user.user_id]
 
     rates = utils.load_rates()
+    pairs = rates.get('pairs', {})  # получаем словарь пар
     rate_key = f"{currency}_USD"
     inv_key = f"USD_{currency}"
     rate = None
-    if rate_key in rates:
-        rate = rates[rate_key]['rate']
-    elif inv_key in rates:
-        rate = 1.0 / rates[inv_key]['rate']
+    if rate_key in pairs:
+        rate = pairs[rate_key]['rate']
+    elif inv_key in pairs:
+        rate = 1.0 / pairs[inv_key]['rate']
     else:
         raise CurrencyNotFoundError(f"Не удалось получить курс для {currency}→USD")
+
     cost = amount * rate
 
     usd_wallet = portfolio.get_wallet("USD")
@@ -176,19 +187,22 @@ def sell(currency: str, amount: float) -> str:
     portfolio = _portfolios[_current_user.user_id]
 
     if currency not in portfolio.wallets:
-        raise CurrencyNotFoundError(f"У вас нет кошелька '{currency}'. Добавьте валюту: она создаётся автоматически при первой покупке.")
+        raise CurrencyNotFoundError(f"У вас нет кошелька '{currency}'. "
+                                    f"Добавьте валюту: она создаётся автоматически при первой покупке.")
+
     target = portfolio.get_wallet(currency)
     if target.balance < amount:
         raise InsufficientFundsError(target.balance, amount, currency)
 
-    rates = utils.load_rates()
+    rates_data = utils.load_rates()
+    pairs = rates_data.get('pairs', {})
     rate_key = f"{currency}_USD"
     inv_key = f"USD_{currency}"
     rate = None
-    if rate_key in rates:
-        rate = rates[rate_key]['rate']
-    elif inv_key in rates:
-        rate = 1.0 / rates[inv_key]['rate']
+    if rate_key in pairs:
+        rate = pairs[rate_key]['rate']
+    elif inv_key in pairs:
+        rate = 1.0 / pairs[inv_key]['rate']
     else:
         raise CurrencyNotFoundError(f"Не удалось получить курс для {currency}→USD")
     proceeds = amount * rate
@@ -212,32 +226,26 @@ def get_rate(from_curr: str, to_curr: str) -> str:
     get_currency(from_curr)
     get_currency(to_curr)
 
-    rates = utils.load_rates()
-    ttl = settings.get('rates_ttl_seconds', 300)  # по умолчанию 5 минут
-    last_refresh_str = rates.get('last_refresh')
-    if last_refresh_str:
-        last_refresh = datetime.fromisoformat(last_refresh_str)
-        if datetime.now() - last_refresh > timedelta(seconds=ttl):
-            # Данные устарели, пытаемся обновить
-            if not _refresh_rates():
-                # Если обновить не удалось
-                raise ApiRequestError("Не удалось обновить курсы валют. Повторите попытку позже.")
-            rates = utils.load_rates()  # перезагружаем после обновления
+    rates_data = utils.load_rates()
+    pairs = rates_data.get('pairs', {})
 
     direct_key = f"{from_curr}_{to_curr}"
-    if direct_key in rates:
-        data = rates[direct_key]
+    inv_key = f"{to_curr}_{from_curr}"
+
+    if direct_key in pairs:
+        data = pairs[direct_key]
         rate = data['rate']
         updated = data['updated_at']
+    elif inv_key in pairs:
+        inv_data = pairs[inv_key]
+        inv_rate = inv_data['rate']
+        rate = 1.0 / inv_rate if inv_rate != 0 else 0
+        updated = inv_data['updated_at']
     else:
-        inv_key = f"{to_curr}_{from_curr}"
-        if inv_key in rates:
-            inv_data = rates[inv_key]
-            inv_rate = inv_data['rate']
-            rate = 1.0 / inv_rate if inv_rate != 0 else 0
-            updated = inv_data['updated_at']
-        else:
-            raise CurrencyNotFoundError(f"Курс {from_curr}→{to_curr} недоступен")
+        raise CurrencyNotFoundError(
+                                    f"Курс {from_curr}→{to_curr} недоступен. "
+                                    f"Выполните update-rates для загрузки данных."
+                                    )
 
     return (f"Курс {from_curr}→{to_curr}: {rate:.8f} (обновлено: {updated})\n"
             f"Обратный курс {to_curr}→{from_curr}: {1.0/rate:.8f}" if rate != 0 else "Курс равен нулю")
