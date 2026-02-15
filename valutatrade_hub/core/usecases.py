@@ -1,7 +1,10 @@
 import hashlib
+import time
+from datetime import datetime, timedelta
 from typing import Optional, List, Dict
 from valutatrade_hub.core.models import User, Portfolio, Wallet
 from valutatrade_hub.core import utils
+from valutatrade_hub.core.currencies import get_currency
 from valutatrade_hub.core.exceptions import CurrencyNotFoundError, InsufficientFundsError, ApiRequestError
 from valutatrade_hub.infra.settings import SettingsLoader
 from valutatrade_hub.decorators import log_action
@@ -27,13 +30,18 @@ def _load_all():
         if uid in users_by_id:
             _portfolios[uid] = Portfolio.from_dict(pd, users_by_id[uid])
 
-
 def _save_all():
     utils.save_users([u.to_dict() for u in _users])
     utils.save_portfolios([p.to_dict() for p in _portfolios.values()])
 
+def _refresh_rates() -> bool:
+    """
+    Попытка обновить курсы валют (заглушка).
+    В реальной системе здесь был бы вызов Parser Service.
+    Возвращает True, если обновление удалось, иначе False.
+    """
+    return False
 
-# Загружаем данные при старте
 _load_all()
 
 def get_current_user() -> Optional[User]:
@@ -68,7 +76,6 @@ def login(username: str, password: str) -> str:
         raise ValueError("Неверный пароль")
     _current_user = user
     return f"Вы вошли как '{username}'"
-
 
 def logout():
     global _current_user
@@ -119,6 +126,10 @@ def buy(currency: str, amount: float) -> str:
     if amount <= 0:
         raise ValueError("amount должен быть положительным числом")
     currency = currency.upper()
+
+    # Валидация кода валюты через get_currency (выбросит CurrencyNotFoundError)
+    get_currency(currency)
+
     portfolio = _portfolios[_current_user.user_id]
 
     rates = utils.load_rates()
@@ -159,6 +170,10 @@ def sell(currency: str, amount: float) -> str:
     if amount <= 0:
         raise ValueError("amount должен быть положительным числом")
     currency = currency.upper()
+
+    # Валидация кода валюты
+    get_currency(currency)
+
     portfolio = _portfolios[_current_user.user_id]
 
     if currency not in portfolio.wallets:
@@ -193,7 +208,23 @@ def sell(currency: str, amount: float) -> str:
 def get_rate(from_curr: str, to_curr: str) -> str:
     from_curr = from_curr.upper()
     to_curr = to_curr.upper()
+
+    # Валидация кодов валют
+    get_currency(from_curr)
+    get_currency(to_curr)
+
     rates = utils.load_rates()
+    ttl = settings.get('rates_ttl_seconds', 300)  # по умолчанию 5 минут
+    last_refresh_str = rates.get('last_refresh')
+    if last_refresh_str:
+        last_refresh = datetime.fromisoformat(last_refresh_str)
+        if datetime.now() - last_refresh > timedelta(seconds=ttl):
+            # Данные устарели, пытаемся обновить
+            if not _refresh_rates():
+                # Если обновить не удалось
+                raise ApiRequestError("Не удалось обновить курсы валют. Повторите попытку позже.")
+            rates = utils.load_rates()  # перезагружаем после обновления
+
     direct_key = f"{from_curr}_{to_curr}"
     if direct_key in rates:
         data = rates[direct_key]
@@ -207,6 +238,7 @@ def get_rate(from_curr: str, to_curr: str) -> str:
             rate = 1.0 / inv_rate if inv_rate != 0 else 0
             updated = inv_data['updated_at']
         else:
-            raise ValueError(f"Курс {from_curr}→{to_curr} недоступен")
+            raise CurrencyNotFoundError(f"Курс {from_curr}→{to_curr} недоступен")
+
     return (f"Курс {from_curr}→{to_curr}: {rate:.8f} (обновлено: {updated})\n"
             f"Обратный курс {to_curr}→{from_curr}: {1.0/rate:.8f}" if rate != 0 else "Курс равен нулю")

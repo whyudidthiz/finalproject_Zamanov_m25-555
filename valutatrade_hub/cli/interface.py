@@ -1,5 +1,11 @@
+from valutatrade_hub.parser_service.config import ParserConfig
+from valutatrade_hub.parser_service.storage import RatesStorage
+from valutatrade_hub.parser_service.updater import RatesUpdater
+from valutatrade_hub.infra.settings import SettingsLoader
+from valutatrade_hub.core.exceptions import ApiRequestError, InsufficientFundsError, CurrencyNotFoundError
+import os
+import json
 import shlex
-from valutatrade_hub.core.exceptions import InsufficientFundsError, CurrencyNotFoundError, ApiRequestError
 from valutatrade_hub.core import usecases
 
 
@@ -68,6 +74,76 @@ def main_loop():
                     except ValueError as e:
                         print(f"Ошибка: {e}")
 
+                case "update-rates":
+                    # Можно добавить опциональный параметр --source, но пока не усложняем
+                    try:
+                        settings = SettingsLoader()
+                        config = ParserConfig()  # используем переменные окружения
+                        # Переопределим пути из настроек, если нужно
+                        config.RATES_FILE_PATH = settings.get('data_path', 'data/') + "rates.json"
+                        config.HISTORY_FILE_PATH = settings.get('data_path', 'data/') + "exchange_rates.json"
+
+                        storage = RatesStorage(config.HISTORY_FILE_PATH, config.RATES_FILE_PATH)
+                        updater = RatesUpdater(config, storage)
+                        result = updater.run_update()
+
+                        if result["errors"]:
+                            print("Update completed with errors:")
+                            for err in result["errors"]:
+                                print(f"  - {err}")
+                        else:
+                            print(f"Update successful. Total rates updated: {result['total']}. Last refresh: {result['last_refresh']}")
+                    except Exception as e:
+                        print(f"Update failed: {str(e)}")
+
+                case "show-rates":
+                    from argparse import Namespace 
+                    currency = kwargs.get("currency")
+                    top = kwargs.get("top")
+                    base = kwargs.get("base", "USD")
+
+                    try:
+                        settings = SettingsLoader()
+                        rates_path = settings.get('data_path', 'data/') + "rates.json"
+                        if not os.path.exists(rates_path):
+                            print("Локальный кеш курсов пуст. Выполните 'update-rates', чтобы загрузить данные.")
+                            continue
+
+                        with open(rates_path, 'r', encoding='utf-8') as f:
+                            cache = json.load(f)
+
+                        pairs = cache.get("pairs", {})
+                        last_refresh = cache.get("last_refresh", "unknown")
+
+                        if not pairs:
+                            print("В кеше нет данных.")
+                            continue
+
+                        # Фильтрация по валюте
+                        if currency:
+                            filtered = {k: v for k, v in pairs.items() if k.startswith(currency.upper() + '_')}
+                            if not filtered:
+                                print(f"Курс для '{currency}' не найден в кеше.")
+                                continue
+                            pairs = filtered
+
+                        # Сортировка по убыванию курса (для top)
+                        items = list(pairs.items())
+                        if top:
+                            try:
+                                top_n = int(top)
+                                items.sort(key=lambda x: x[1]['rate'], reverse=True)
+                                items = items[:top_n]
+                            except ValueError:
+                                pass
+
+                        print(f"Rates from cache (updated at {last_refresh}):")
+                        for pair, data in items:
+                            print(f"- {pair}: {data['rate']}")
+
+                    except Exception as e:
+                        print(f"Ошибка при показе курсов: {str(e)}")
+                
                 case "login":
                     username = kwargs.get("username")
                     password = kwargs.get("password")
