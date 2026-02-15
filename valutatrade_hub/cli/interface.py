@@ -1,12 +1,13 @@
+import json
+import os
+import shlex
+
+from valutatrade_hub.core import usecases
+from valutatrade_hub.core.exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError
+from valutatrade_hub.infra.settings import SettingsLoader
 from valutatrade_hub.parser_service.config import ParserConfig
 from valutatrade_hub.parser_service.storage import RatesStorage
 from valutatrade_hub.parser_service.updater import RatesUpdater
-from valutatrade_hub.infra.settings import SettingsLoader
-from valutatrade_hub.core.exceptions import ApiRequestError, InsufficientFundsError, CurrencyNotFoundError
-import os
-import json
-import shlex
-from valutatrade_hub.core import usecases
 
 
 def parse_args(args_line: str) -> dict:
@@ -97,7 +98,6 @@ def main_loop():
                         print(f"Update failed: {str(e)}")
 
                 case "show-rates":
-                    from argparse import Namespace 
                     currency = kwargs.get("currency")
                     top = kwargs.get("top")
                     base = kwargs.get("base", "USD")
@@ -143,7 +143,7 @@ def main_loop():
 
                     except Exception as e:
                         print(f"Ошибка при показе курсов: {str(e)}")
-                
+
                 case "login":
                     username = kwargs.get("username")
                     password = kwargs.get("password")

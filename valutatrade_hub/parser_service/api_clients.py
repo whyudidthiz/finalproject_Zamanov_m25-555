@@ -1,9 +1,10 @@
-import requests
-import time
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Any, Dict
+
+import requests
 
 from valutatrade_hub.core.exceptions import ApiRequestError
+
 from .config import ParserConfig
 
 

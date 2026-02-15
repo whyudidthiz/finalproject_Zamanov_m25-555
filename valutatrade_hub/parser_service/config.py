@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
-from typing import Tuple, Dict
+from typing import Dict, Tuple
+
 
 @dataclass
 class ParserConfig:

@@ -1,8 +1,8 @@
 import functools
 import logging
-from typing import Optional, Callable, Any
+from typing import Callable
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
 
 def log_action(verbose: bool = False):
     """
@@ -21,7 +21,7 @@ def log_action(verbose: bool = False):
             currency = kwargs.get('currency')
             amount = kwargs.get('amount')
             base = kwargs.get('base_currency', 'USD')  # по умолчанию
-            rate = None 
+            rate = None
 
             # Словарь для дополнительной информации при verbose
             extra_info = {}
@@ -35,7 +35,7 @@ def log_action(verbose: bool = False):
                 log_level = logging.ERROR
                 status = 'ERROR'
                 error_msg = f'error_type={type(e).__name__} error_message="{str(e)}"'
-                raise  
+                raise
             else:
                 log_parts = [
                     f'action={action}',

@@ -1,13 +1,12 @@
-import hashlib
-import time
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict
-from valutatrade_hub.core.models import User, Portfolio, Wallet
+from typing import Dict, List, Optional
+
 from valutatrade_hub.core import utils
 from valutatrade_hub.core.currencies import get_currency
-from valutatrade_hub.core.exceptions import CurrencyNotFoundError, InsufficientFundsError, ApiRequestError
-from valutatrade_hub.infra.settings import SettingsLoader
+from valutatrade_hub.core.exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError
+from valutatrade_hub.core.models import Portfolio, User, Wallet
 from valutatrade_hub.decorators import log_action
+from valutatrade_hub.infra.settings import SettingsLoader
 
 # Глобальное состояние
 _current_user: Optional[User] = None

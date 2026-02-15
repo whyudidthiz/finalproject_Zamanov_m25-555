@@ -1,7 +1,8 @@
 # valutatrade_hub/core/currencies.py
 
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+from typing import Dict
+
 from .exceptions import CurrencyNotFoundError
 
 

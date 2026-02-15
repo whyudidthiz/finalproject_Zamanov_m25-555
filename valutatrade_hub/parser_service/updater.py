@@ -1,10 +1,11 @@
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from valutatrade_hub.core.exceptions import ApiRequestError
 
 from .api_clients import BaseApiClient, CoinGeckoClient, ExchangeRateApiClient
-from .storage import RatesStorage
 from .config import ParserConfig
-from valutatrade_hub.core.exceptions import ApiRequestError
+from .storage import RatesStorage
 
 logger = logging.getLogger(__name__)
 

@@ -2,9 +2,7 @@ import json
 import os
 import shutil
 from datetime import datetime
-from typing import Dict, List, Any
-
-from valutatrade_hub.core import utils
+from typing import Dict
 
 
 class RatesStorage:

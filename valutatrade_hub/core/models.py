@@ -1,7 +1,8 @@
-import hashlib
 import datetime
+import hashlib
 import os
-from typing import Dict, Optional, Any
+from typing import Any, Dict
+
 from .exceptions import InsufficientFundsError
 
 
