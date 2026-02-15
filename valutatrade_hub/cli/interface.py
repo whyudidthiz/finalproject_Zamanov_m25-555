@@ -1,4 +1,5 @@
 import shlex
+from valutatrade_hub.core.exceptions import InsufficientFundsError, CurrencyNotFoundError, ApiRequestError
 from valutatrade_hub.core import usecases
 
 

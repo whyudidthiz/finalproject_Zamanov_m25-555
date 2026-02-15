@@ -4,6 +4,7 @@ from valutatrade_hub.core.models import User, Portfolio, Wallet
 from valutatrade_hub.core import utils
 from valutatrade_hub.core.exceptions import CurrencyNotFoundError, InsufficientFundsError, ApiRequestError
 from valutatrade_hub.infra.settings import SettingsLoader
+from valutatrade_hub.decorators import log_action
 
 # Глобальное состояние
 _current_user: Optional[User] = None
@@ -35,7 +36,10 @@ def _save_all():
 # Загружаем данные при старте
 _load_all()
 
+def get_current_user() -> Optional[User]:
+    return _current_user
 
+@log_action()
 def register(username: str, password: str) -> str:
     if any(u.username == username for u in _users):
         raise ValueError(f"Имя пользователя '{username}' уже занято")
@@ -54,7 +58,7 @@ def register(username: str, password: str) -> str:
     _save_all()
     return f"Пользователь '{username}' зарегистрирован (id={new_id}). Войдите: login --username {username} --password ****"
 
-
+@log_action()
 def login(username: str, password: str) -> str:
     global _current_user
     user = next((u for u in _users if u.username == username), None)
@@ -69,10 +73,6 @@ def login(username: str, password: str) -> str:
 def logout():
     global _current_user
     _current_user = None
-
-
-def get_current_user() -> Optional[User]:
-    return _current_user
 
 def show_portfolio(base_currency: Optional[str] = None) -> str:
     # Если базовая валюта не указана явно, берём из настроек
@@ -112,6 +112,7 @@ def show_portfolio(base_currency: Optional[str] = None) -> str:
     lines.append(f"ИТОГО: {total:.2f} {base_currency}")
     return "\n".join(lines)
 
+@log_action(verbose=True)
 def buy(currency: str, amount: float) -> str:
     if not _current_user:
         raise ValueError("Сначала выполните login")
@@ -151,6 +152,7 @@ def buy(currency: str, amount: float) -> str:
             f"- USD: было {usd_wallet.balance + cost:.2f} → стало {usd_wallet.balance:.2f}\n"
             f"Оценочная стоимость покупки: {cost:.2f} USD")
 
+@log_action(verbose=True)
 def sell(currency: str, amount: float) -> str:
     if not _current_user:
         raise ValueError("Сначала выполните login")
