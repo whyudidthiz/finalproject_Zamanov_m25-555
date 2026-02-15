@@ -86,6 +86,8 @@ def main_loop():
                         print(result)
                     except ValueError as e:
                         print(f"Ошибка: {e}")
+                    except CurrencyNotFoundError as e:
+                        print(f"Ошибка: {e}\nПроверьте поддерживаемые коды валют (например, USD, EUR, BTC, ETH).")
 
                 case "buy":
                     currency = kwargs.get("currency")
@@ -98,7 +100,13 @@ def main_loop():
                         result = usecases.buy(currency, amount)
                         print(result)
                     except ValueError as e:
-                        print(f"Ошибка: {e}")
+                        print(f"Ошибка ввода: {e}")
+                    except InsufficientFundsError as e:
+                        print(e)  # выводим сообщение как есть
+                    except CurrencyNotFoundError as e:
+                        print(f"Ошибка: {e}\nПроверьте поддерживаемые коды валют (например, USD, EUR, BTC, ETH).")
+                    except ApiRequestError as e:
+                        print(f"Ошибка API: {e}. Повторите попытку позже.")
 
                 case "sell":
                     currency = kwargs.get("currency")
@@ -112,6 +120,12 @@ def main_loop():
                         print(result)
                     except ValueError as e:
                         print(f"Ошибка: {e}")
+                    except InsufficientFundsError as e:
+                        print(e)
+                    except CurrencyNotFoundError as e:
+                        print(f"Ошибка: {e}\nПроверьте поддерживаемые коды валют (например, USD, EUR, BTC, ETH).")
+                    except ApiRequestError as e:
+                        print(f"Ошибка API: {e}. Повторите попытку позже.")
 
                 case "get-rate":
                     from_curr = kwargs.get("from")
@@ -124,6 +138,10 @@ def main_loop():
                         print(result)
                     except ValueError as e:
                         print(f"Ошибка: {e}")
+                    except CurrencyNotFoundError as e:
+                        print(f"Ошибка: {e}\nПроверьте поддерживаемые коды валют (например, USD, EUR, BTC, ETH).")
+                    except ApiRequestError as e:
+                        print(f"Ошибка API: {e}. Повторите попытку позже.")
 
                 case _:
                     print("Неизвестная команда. Введите 'help' для справки.")

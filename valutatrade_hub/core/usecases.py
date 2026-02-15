@@ -2,12 +2,15 @@ import hashlib
 from typing import Optional, List, Dict
 from valutatrade_hub.core.models import User, Portfolio, Wallet
 from valutatrade_hub.core import utils
+from valutatrade_hub.core.exceptions import CurrencyNotFoundError, InsufficientFundsError, ApiRequestError
+from valutatrade_hub.infra.settings import SettingsLoader
 
 # Глобальное состояние
 _current_user: Optional[User] = None
 _users: List[User] = []
 _portfolios: Dict[int, Portfolio] = {}
 
+settings = SettingsLoader()
 
 def _load_all():
     global _users, _portfolios
@@ -71,8 +74,11 @@ def logout():
 def get_current_user() -> Optional[User]:
     return _current_user
 
+def show_portfolio(base_currency: Optional[str] = None) -> str:
+    # Если базовая валюта не указана явно, берём из настроек
+    if base_currency is None:
+        base_currency = settings.get('default_base_currency', 'USD')
 
-def show_portfolio(base_currency: str = "USD") -> str:
     if not _current_user:
         raise ValueError("Сначала выполните login")
     portfolio = _portfolios.get(_current_user.user_id)
@@ -87,7 +93,6 @@ def show_portfolio(base_currency: str = "USD") -> str:
     else:
         for code, wallet in portfolio.wallets.items():
             balance = wallet.balance
-            # Конвертация
             rate_key = f"{code}_{base_currency}"
             inv_key = f"{base_currency}_{code}"
             rate = None
@@ -107,7 +112,6 @@ def show_portfolio(base_currency: str = "USD") -> str:
     lines.append(f"ИТОГО: {total:.2f} {base_currency}")
     return "\n".join(lines)
 
-
 def buy(currency: str, amount: float) -> str:
     if not _current_user:
         raise ValueError("Сначала выполните login")
@@ -116,7 +120,6 @@ def buy(currency: str, amount: float) -> str:
     currency = currency.upper()
     portfolio = _portfolios[_current_user.user_id]
 
-    # Курс к USD
     rates = utils.load_rates()
     rate_key = f"{currency}_USD"
     inv_key = f"USD_{currency}"
@@ -126,12 +129,12 @@ def buy(currency: str, amount: float) -> str:
     elif inv_key in rates:
         rate = 1.0 / rates[inv_key]['rate']
     else:
-        raise ValueError(f"Не удалось получить курс для {currency}→USD")
+        raise CurrencyNotFoundError(f"Не удалось получить курс для {currency}→USD")
     cost = amount * rate
 
     usd_wallet = portfolio.get_wallet("USD")
     if usd_wallet.balance < cost:
-        raise ValueError(f"Недостаточно USD: доступно {usd_wallet.balance:.2f}, требуется {cost:.2f}")
+        raise InsufficientFundsError(usd_wallet.balance, cost, "USD")
 
     usd_wallet.withdraw(cost)
     if currency in portfolio.wallets:
@@ -148,7 +151,6 @@ def buy(currency: str, amount: float) -> str:
             f"- USD: было {usd_wallet.balance + cost:.2f} → стало {usd_wallet.balance:.2f}\n"
             f"Оценочная стоимость покупки: {cost:.2f} USD")
 
-
 def sell(currency: str, amount: float) -> str:
     if not _current_user:
         raise ValueError("Сначала выполните login")
@@ -158,10 +160,10 @@ def sell(currency: str, amount: float) -> str:
     portfolio = _portfolios[_current_user.user_id]
 
     if currency not in portfolio.wallets:
-        raise ValueError(f"У вас нет кошелька '{currency}'. Добавьте валюту: она создаётся автоматически при первой покупке.")
+        raise CurrencyNotFoundError(f"У вас нет кошелька '{currency}'. Добавьте валюту: она создаётся автоматически при первой покупке.")
     target = portfolio.get_wallet(currency)
     if target.balance < amount:
-        raise ValueError(f"Недостаточно средств: доступно {target.balance:.4f} {currency}, требуется {amount:.4f}")
+        raise InsufficientFundsError(target.balance, amount, currency)
 
     rates = utils.load_rates()
     rate_key = f"{currency}_USD"
@@ -172,7 +174,7 @@ def sell(currency: str, amount: float) -> str:
     elif inv_key in rates:
         rate = 1.0 / rates[inv_key]['rate']
     else:
-        raise ValueError(f"Не удалось получить курс для {currency}→USD")
+        raise CurrencyNotFoundError(f"Не удалось получить курс для {currency}→USD")
     proceeds = amount * rate
 
     target.withdraw(amount)
@@ -185,7 +187,6 @@ def sell(currency: str, amount: float) -> str:
             f"- {currency}: было {target.balance + amount:.4f} → стало {target.balance:.4f}\n"
             f"- USD: было {usd_wallet.balance - proceeds:.2f} → стало {usd_wallet.balance:.2f}\n"
             f"Оценочная выручка: {proceeds:.2f} USD")
-
 
 def get_rate(from_curr: str, to_curr: str) -> str:
     from_curr = from_curr.upper()
