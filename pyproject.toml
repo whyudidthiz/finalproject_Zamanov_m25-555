@@ -1,36 +1,31 @@
 [project]
 name = "finalproject-zamanov-m25-555"
 version = "0.1.0"
-description = "platform for tracking and simulating currency trading"
+description = "Platform for tracking and simulating currency trading"
 authors = [
     {name = "Аноним Ноунеймович",email = "midnight01327@yandex.ru"}
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "prettytable (>=3.17.0,<4.0.0)"
+    "prettytable (>=3.17.0,<4.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "requests (>=2.32.5,<3.0.0)"
 ]
 
 [tool.poetry]
 packages = [{include = "valutatrade_hub"}]
 
 [tool.poetry.scripts]
-trade = "main:main"
+project = "main:main"
 
 [tool.ruff]
-line-length = 120
+line-length = 125
 target-version = "py313"
 exclude = [".venv", "dist", "__pycache__"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
 ignore = []
-
-[tool.poetry.dependencies]
-python = ">=3.13"
-prettytable = "^3.17.0"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.15.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

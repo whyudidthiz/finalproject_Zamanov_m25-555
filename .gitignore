@@ -4,6 +4,7 @@ dist/
 build/
 *.egg-info/
 __pycache__/
+*.pyc
 .vscode/
 .idea/
 .vs/
@@ -11,3 +12,5 @@ __pycache__/
 Thumbs.db
 
 .env
+config.json
+logs/

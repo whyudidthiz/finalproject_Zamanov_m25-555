@@ -46,3 +46,82 @@
 2026-02-16T04:26:37.647 INFO CoinGeckoClient: OK (3 rates)
 2026-02-16T04:26:37.664 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
 2026-02-16T04:26:37.666 INFO Cache updated with 3 rates
+2026-02-16T04:50:48.334 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T04:51:11.097 INFO action=BUY user=alice user_id=1 base=USD result=OK
+2026-02-16T04:51:27.879 INFO Starting rates update...
+2026-02-16T04:51:28.518 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T04:51:28.527 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T04:51:28.530 INFO Cache updated with 3 rates
+2026-02-16T04:51:42.829 INFO Starting rates update...
+2026-02-16T04:51:43.275 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T04:51:43.295 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T04:51:43.309 INFO Cache updated with 3 rates
+2026-02-16T04:54:58.253 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T04:55:14.661 INFO Starting rates update...
+2026-02-16T04:55:15.175 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T04:55:15.200 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T04:55:15.203 INFO Cache updated with 3 rates
+2026-02-16T04:58:57.803 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T04:59:16.348 INFO Starting rates update...
+2026-02-16T04:59:16.887 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T04:59:16.914 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T04:59:16.918 INFO Cache updated with 3 rates
+2026-02-16T05:03:03.715 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T05:03:22.347 INFO Starting rates update...
+2026-02-16T05:03:22.842 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:03:22.863 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:03:22.865 INFO Cache updated with 3 rates
+2026-02-16T05:23:06.561 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T05:23:33.651 INFO Starting rates update...
+2026-02-16T05:23:34.226 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:23:34.263 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:23:34.295 INFO Cache updated with 3 rates
+2026-02-16T05:27:14.057 INFO action=REGISTER user=anonymous base=USD result=OK
+2026-02-16T05:27:31.393 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T05:27:39.855 INFO Starting rates update...
+2026-02-16T05:27:40.448 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:27:40.460 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:27:40.476 INFO Cache updated with 3 rates
+2026-02-16T05:33:15.562 INFO Starting rates update...
+2026-02-16T05:33:16.188 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:33:16.211 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:33:16.214 INFO Cache updated with 3 rates
+2026-02-16T05:35:42.178 INFO Starting rates update...
+2026-02-16T05:35:42.668 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:35:43.229 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T05:35:43.236 INFO Cache updated with 6 rates
+2026-02-16T05:37:35.117 INFO action=REGISTER user=anonymous base=USD result=OK
+2026-02-16T05:39:17.367 INFO action=LOGIN user=anonymous base=USD result=OK
+2026-02-16T05:41:21.695 INFO action=BUY user=ivan user_id=4 base=USD result=OK
+2026-02-16T05:43:05.120 INFO Starting rates update...
+2026-02-16T05:43:05.660 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:43:06.224 INFO ExchangeRateApiClient: OK (3 rates)
+2026-02-16T05:43:06.236 INFO Cache updated with 6 rates
+2026-02-16T05:47:12.774 INFO Starting rates update...
+2026-02-16T05:47:13.362 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:47:13.373 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:47:13.375 INFO Cache updated with 3 rates
+2026-02-16T05:49:24.390 INFO Starting rates update...
+2026-02-16T05:49:24.978 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:49:25.000 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:49:25.016 INFO Cache updated with 3 rates
+2026-02-16T05:50:06.306 INFO Starting rates update...
+2026-02-16T05:50:06.785 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:50:06.798 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:50:06.809 INFO Cache updated with 3 rates
+2026-02-16T05:50:08.374 INFO Starting rates update...
+2026-02-16T05:50:08.736 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:50:08.750 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:50:08.761 INFO Cache updated with 3 rates
+2026-02-16T05:50:09.410 INFO Starting rates update...
+2026-02-16T05:50:09.789 INFO CoinGeckoClient: OK (3 rates)
+2026-02-16T05:50:09.803 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:50:09.813 INFO Cache updated with 3 rates
+2026-02-16T05:50:10.316 INFO Starting rates update...
+2026-02-16T05:50:10.683 ERROR CoinGeckoClient: ERROR - Ошибка при обращении к внешнему API: Ошибка при обращении к внешнему API: HTTP 0
+2026-02-16T05:50:10.684 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:50:10.685 WARNING No rates were fetched
+2026-02-16T05:50:27.225 INFO Starting rates update...
+2026-02-16T05:50:27.593 ERROR CoinGeckoClient: ERROR - Ошибка при обращении к внешнему API: Ошибка при обращении к внешнему API: HTTP 0
+2026-02-16T05:50:27.595 ERROR ExchangeRateApiClient: ERROR - Ошибка при обращении к внешнему API: API ключ для ExchangeRate-API не задан
+2026-02-16T05:50:27.596 WARNING No rates were fetched

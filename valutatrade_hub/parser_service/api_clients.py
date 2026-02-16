@@ -33,13 +33,28 @@ class BaseApiClient(ABC):
         except requests.exceptions.ConnectionError:
             raise ApiRequestError(f"Ошибка соединения с {url}")
         except requests.exceptions.HTTPError as e:
-            # Попробуем извлечь детали из ответа
+            status_code = e.response.status_code if e.response else 0
+            # Пытаемся получить детали из ответа (если есть JSON)
             try:
-                error_data = response.json()
-                error_msg = error_data.get('error', str(e))
+                error_data = e.response.json() if e.response else {}
+                api_error = error_data.get('error', error_data.get('message', ''))
             except Exception:
-                error_msg = str(e)
-            raise ApiRequestError(f"HTTP ошибка {response.status_code}: {error_msg}")
+                api_error = ''
+            if api_error:
+                error_msg = api_error
+            elif status_code == 401:
+                error_msg = "Неверный API ключ или доступ запрещён (401)"
+            elif status_code == 403:
+                error_msg = "Доступ запрещён (403)"
+            elif status_code == 404:
+                error_msg = "Ресурс не найден (404)"
+            elif status_code == 429:
+                error_msg = "Слишком много запросов (429). Попробуйте позже."
+            elif 500 <= status_code < 600:
+                error_msg = f"Ошибка сервера ({status_code})"
+            else:
+                error_msg = f"HTTP {status_code}"
+            raise ApiRequestError(f"Ошибка при обращении к внешнему API: {error_msg}")
         except Exception as e:
             raise ApiRequestError(f"Неизвестная ошибка: {str(e)}")
 

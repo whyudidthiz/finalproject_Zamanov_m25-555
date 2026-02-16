@@ -3,6 +3,7 @@ import os
 import shlex
 
 from prettytable import PrettyTable
+
 from valutatrade_hub.core import usecases
 from valutatrade_hub.core.exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError
 from valutatrade_hub.infra.settings import SettingsLoader
@@ -148,7 +149,7 @@ def main_loop():
                         for pair, data in items:
                             # Округление до 5 знаков для красоты
                             table.add_row([pair, f"{data['rate']:.5f}"])
-                        
+
                         print(f"Rates from cache (updated at {last_refresh}):")
                         print(table)
 
